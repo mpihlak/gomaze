@@ -17,7 +17,7 @@ const (
 func GenerateRandomMaze(width, height int) Level {
 	level := MakeEmptyLevel(width, height)
 
-	// Fill the inside of the level with tiles
+	// Fill the inside of the level with tiles, we're gonna plough into it to make a maze.
 	for row, tileRow := range level.tiles {
 		for col := range tileRow {
 			if row > 0 && col > 0 && row < level.height-1 && col < level.width-1 {
@@ -30,14 +30,14 @@ func GenerateRandomMaze(width, height int) Level {
 	startPos := Position{row: 0, col: 1}
 	exitPos := Position{row: level.height - 1, col: level.width - 2}
 
-	// turnStack stores all the turning points, so that we can come back to
-	// it when run into dead end.
+	// turnStack stores all the turning points, so that we can pop a previous location
+	// when we run into dead end.
 	turnStack := make([]Position, 0)
 	turnStack = append(turnStack, startPos)
 	pos := startPos
 
 	// Keep generating while we have not considered all options.
-	// Eg. not done until we've popped the last element off the turnStack
+	// not done until we've popped the last element off the turnStack
 	for len(turnStack) > 0 {
 		steps := 0
 
@@ -77,8 +77,8 @@ func GenerateRandomMaze(width, height int) Level {
 			pos = turnStack[len(turnStack)-1]
 			turnStack = turnStack[:len(turnStack)-1]
 		}
-
 	}
+
 	level.CreateHorizontalExit(startPos)
 	level.CreateHorizontalExit(exitPos)
 	return level

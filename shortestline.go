@@ -1,11 +1,5 @@
 // Package maze ... simple navigator, always try to move towards the direction
-// that has shortest straight line distance to finish.
-//
-// This makes a bunch of decisions that humans wouldn't make, but gets through
-// the maze just fine. Possible enhancements:
-// * Add a concept of visibility for more human-like traversal.
-// * Don't look into visible cul de sacs.
-// * Add awareness of the level layout
+// that has shortest euclidean distance to finish.
 package maze
 
 import "math"
@@ -72,8 +66,8 @@ func (walker *ShortestLineWalker) NextPosition() {
 	}
 
 	if bestDirIndex < 0 {
-		// We've failed :(
-    panic("I'm stuck here ...")
+		// We've failed :( This could be because the maze is not navigable or that
+		// we've bumped into another actor.
 	} else {
 		walker.actor.CurrPos = AddDirection(start, ValidDirections[bestDirIndex])
 		walker.actor.Path = append(walker.actor.Path, walker.actor.CurrPos)

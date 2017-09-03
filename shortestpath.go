@@ -6,7 +6,7 @@ import (
 	"math"
 )
 
-// PathNode is used in shortest path calculation
+// PathNode represents a node on the graph. It's created from an empty space on the map.
 type PathNode struct {
 	parent   *PathNode
 	distance int
@@ -44,12 +44,12 @@ func (pq *PathNodePQ) Pop() interface{} {
 }
 
 // CalculateShortestPath generates the shortest path from the current location of the actor
-// to it's endPos using Dijkstra's algorithm. The level is not mutated in the process, instead the
-// path is stored in actors Path variable.
+// to it's endPos using Dijkstra's algorithm. The level is not mutated in the process, the
+// calculated path is stored in actor.
 //
-// The graph is represented here as a matrix[rows][columns] of nodes (ie. a level map) where an
-// empty position in the matrix is a node (eg. something that can be walked on) and it's connected
-// to it's neighboring nodes with edges of weight 1.
+// The graph is represented here as a matrix[rows][columns] of nodes where an
+// empty position in the matrix is a node (eg. something that can be walked on)
+// and it's connected to it's neighboring nodes with edges of weight 1.
 func CalculateShortestPath(level Level, actor *Actor, endPos Position) {
 
 	// nodeMap is a copy of the map that we can scribble on. It will be
@@ -61,8 +61,9 @@ func CalculateShortestPath(level Level, actor *Actor, endPos Position) {
 	var nodes PathNodePQ
 
 	// First build the map of nodes, so that every empty tile on the level will
-	// be a node. Initialize the node's distance to infinity, if it's not the starting node.
-	// Build a priority queue of all the nodes by distance to the starting node.
+	// be a node. Initialize the node's distance to infinity, if it's not the
+	// starting node.  Build a priority queue of all the nodes by distance to the
+	// starting node.
 	for row, rowTiles := range level.tiles {
 		nodeMap[row] = make([]PathNode, level.width)
 		for col := range rowTiles {
@@ -158,6 +159,16 @@ func (walker *ShortestPathWalker) Initialize(level *Level, actor *Actor) {
 	walker.actor = actor
 	CalculateShortestPath(*level, actor, actor.EndPos)
 	walker.pathIndex = len(actor.Path) - 1
+}
+
+// HasFinished returns true if the walker has reached it's destination
+func (walker *ShortestPathWalker) HasFinished() bool {
+	return walker.actor.CurrPos == walker.actor.EndPos
+}
+
+// GetActor returns the internal actor
+func (walker *ShortestPathWalker) GetActor() *Actor {
+	return walker.actor
 }
 
 // NextPosition advances the actor to the next step on the path. Shortest path, in this case.

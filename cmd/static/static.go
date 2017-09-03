@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"strings"
 
 	"github.com/mpihlak/maze"
@@ -21,26 +20,19 @@ func main() {
 
 	scanner := bufio.NewScanner(strings.NewReader(asciiArtLevel))
 	level := maze.ReadLevel(scanner)
-	movez := make(maze.WalkerChannel)
 
-	render := maze.NewStreamRenderer()
+	render := maze.NewTermboxRenderer()
 	defer render.Done()
 
+  // Exits are not marked on the level, so we just make one up
 	for _, actor := range level.Actors {
 		actor.EndPos = level.Exits[0]
-		go maze.WalkThrough(level, actor, &maze.ShortestPathWalker{}, movez)
+    actor.PathNav = &maze.ShortestPathWalker{}
 	}
 
-	done := false
-	for counter := 0; !done; counter++ {
-		select {
-		case a := <-movez:
-			if a.HasFinished() {
-				done = true
-			}
-		}
+  controller := maze.NewController(&level, render)
+  controller.Start()
+  for controller.RunLoop() { }
+  controller.Done()
 
-		maze.Render(level, fmt.Sprintf("Iteration #%d", counter), render)
-		counter++
-	}
 }

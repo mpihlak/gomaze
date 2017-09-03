@@ -36,15 +36,6 @@ type Tile struct {
 	Character rune
 }
 
-// Actor is something that can move around on the level
-type Actor struct {
-	Character rune       // Display character
-	CurrPos   Position   // Current location
-	EndPos    Position   // Destination, if calculated
-	Path      []Position // Path, if calculated.
-  PathNav   Walker
-}
-
 // Level describes the map and everything on it
 type Level struct {
 	width  int
@@ -101,6 +92,16 @@ func (level Level) IsWalkable(pos Position) bool {
 	return true
 }
 
+// HasActor tells if there's an actor at a given position or not
+func (level Level) HasActor(pos Position) bool {
+	for _, actor := range level.Actors {
+		if actor.CurrPos == pos {
+			return false
+		}
+	}
+	return true
+}
+
 // CanMove tells if the position on the level is vacant or not
 func (level Level) CanMove(pos Position) bool {
 
@@ -112,19 +113,11 @@ func (level Level) CanMove(pos Position) bool {
 		return false
 	}
 
-	// How about other actors?
-	for _, actor := range level.Actors {
-		if actor.CurrPos == pos {
-			return false
-		}
-	}
+	// XXX: While navigating we should check for other actors on the level so
+	// that we don't step on them. We can't do it here though, as this would
+	// result in an unnavigable maze if one of the actors is blocking an exit.
 
 	return true
-}
-
-// HasFinished returns true if the actor has reached its destination
-func (a Actor) HasFinished() bool {
-	return a.CurrPos == a.EndPos
 }
 
 // AddDirection adds the direction to position and returns the new position
@@ -135,11 +128,4 @@ func AddDirection(pos Position, d Direction) Position {
 // AddActor adds a new Actor to the level
 func (level *Level) AddActor(a *Actor) {
 	level.Actors = append(level.Actors, a)
-}
-
-// AddWalker adds a new walker to the level
-func (level *Level) AddWalker(c rune, startPos, endPos Position, navigator Walker) {
-  actor := &Actor{ Character: c, CurrPos: startPos, EndPos: endPos, PathNav: navigator }
-  navigator.Initialize(level, actor)
-  level.Actors = append(level.Actors, actor)
 }

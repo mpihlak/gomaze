@@ -25,30 +25,19 @@ func main() {
   width, height := render.Size()
 	level := maze.GenerateRandomMaze(width, height-1)
 
-	movez := make(maze.WalkerChannel)
+  a1 := maze.NewActor('@', level.Exits[0], level.Exits[1], &maze.ShortestLineWalker{})
+	level.AddActor(a1)
 
-	level.AddActor(&maze.Actor{Character: '@', CurrPos: level.Exits[0], EndPos: level.Exits[1]})
-	level.AddActor(&maze.Actor{Character: '&', CurrPos: level.Exits[1], EndPos: level.Exits[0]})
+  a2 := maze.NewActor('&', level.Exits[1], level.Exits[0], &maze.ShortestPathWalker{})
+	level.AddActor(a2)
 
-	for _, w := range level.Actors {
-		go maze.WalkThrough(level, w, &maze.ShortestLineWalker{}, movez)
-	}
+  controller := maze.NewController(&level, render)
+  controller.Start()
 
-	done := false
-	for frame := 1; !done; frame++ {
-		select {
-		case a := <-movez:
-			if a.HasFinished() {
-				done = true
-			}
-		case k := <-render.GetKeyboardEvent():
-			if k == maze.KBEventCancel {
-				done = true
-			}
-		}
-		maze.Render(level, fmt.Sprintf("render #%d", frame), render)
-	}
+  for controller.RunLoop() {
+    // RunLoop takes care of rendering and keyboard events.
+    // Do whatever you want here.
+  }
 
-	maze.Render(level, "Woohoo! Press any key to exit...", render)
-	<-render.GetKeyboardEvent()
+  controller.Done()
 }

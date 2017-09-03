@@ -1,7 +1,7 @@
 package maze
 
 import (
-  "fmt"
+	"fmt"
 	"github.com/nsf/termbox-go"
 )
 
@@ -48,7 +48,6 @@ func Render(level Level, banner string, r Renderer) {
 		actorMap[actor.CurrPos] = actor.Character
 	}
 
-	// fmt.Println(banner)
 	r.Reset()
 	for _, c := range banner {
 		r.PutChar(rune(c))
@@ -93,7 +92,7 @@ func NewTermboxRenderer() *TermboxRenderer {
 				switch ev.Key {
 				case termbox.KeyEsc:
 					fallthrough
-        case termbox.KeyCtrlC:
+				case termbox.KeyCtrlC:
 					t.kbEvents <- KBEventCancel
 				default:
 					t.kbEvents <- KBEventUnknown
@@ -169,17 +168,17 @@ func (t *StreamRenderer) Size() (int, int) {
 
 // NextLine advances the current row and resets the column to the start of the row.
 func (t *StreamRenderer) NextLine() {
-  fmt.Print("\n");
+	fmt.Print("\n")
 }
 
 // PutChar puts the character into the current position indicated by row and column and
 // advances the column.
 func (t *StreamRenderer) PutChar(c rune) {
-  fmt.Print(string(c))
+	fmt.Print(string(c))
 }
 
 // Reset the terminal so that we start again from the top left corner.
-func (t *StreamRenderer) Reset() { }
+func (t *StreamRenderer) Reset() {}
 
 // Flush renders the current state of the buffer.
-func (t *StreamRenderer) Flush() { }
+func (t *StreamRenderer) Flush() {}
