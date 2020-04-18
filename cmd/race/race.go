@@ -22,22 +22,22 @@ func main() {
 
 	render := maze.NewTermboxRenderer()
 	defer render.Done()
-  width, height := render.Size()
+	width, height := render.Size()
 	level := maze.GenerateRandomMaze(width, height-1)
 
-  a1 := maze.NewActor('@', level.Exits[0], level.Exits[1], &maze.ShortestLineWalker{})
+	a1 := maze.NewActor('@', level.Exits[0], level.Exits[1], &maze.ShortestPathWalker{})
 	level.AddActor(a1)
 
-  a2 := maze.NewActor('&', level.Exits[1], level.Exits[0], &maze.ShortestPathWalker{})
+	a2 := maze.NewActor('&', level.Exits[1], level.Exits[0], &maze.ShortestPathWalker{})
 	level.AddActor(a2)
 
-  controller := maze.NewController(&level, render)
-  controller.Start()
+	controller := maze.NewController(&level, render)
+	controller.Start()
 
-  for controller.RunLoop() {
-    // RunLoop takes care of rendering and keyboard events.
-    // Do whatever you want here.
-  }
+	for controller.RunLoop() {
+		// RunLoop takes care of rendering and keyboard events.
+		// Do whatever you want here.
+	}
 
-  controller.Done()
+	controller.Done()
 }

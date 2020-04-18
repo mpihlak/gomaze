@@ -24,15 +24,15 @@ func main() {
 	render := maze.NewTermboxRenderer()
 	defer render.Done()
 
-  // Exits are not marked on the level, so we just make one up
+	// Exits are not marked on the level, so we just make one up
 	for _, actor := range level.Actors {
 		actor.EndPos = level.Exits[0]
-    actor.PathNav = &maze.ShortestPathWalker{}
+		actor.PathNav = &maze.ShortestPathWalker{}
 	}
 
-  controller := maze.NewController(&level, render)
-  controller.Start()
-  for controller.RunLoop() { }
-  controller.Done()
-
+	controller := maze.NewController(&level, render)
+	controller.Start()
+	for controller.RunLoop() {
+	}
+	controller.Done()
 }
